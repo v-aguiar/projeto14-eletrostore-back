@@ -63,7 +63,11 @@ export async function signIn(req, res) {
       registeredUser &&
       bcrypt.compareSync(password, registeredUser.password)
     ) {
-      const token = uuidv4();
+      const existingSession = await db
+        .collection("sessions")
+        .findOne({ userId: registeredUser._id });
+
+      const token = existingSession.error ? uuidv4() : existingSession.token;
 
       await db.collection("sessions").insertOne({
         token,
@@ -71,7 +75,7 @@ export async function signIn(req, res) {
         timestamp: Date.now(),
       });
 
-      res.status(200).send({ token, userName: registeredUser.name });
+      res.status(200).send({ token, username: registeredUser.name });
       return;
     } else {
       console.error("⚠ No user registered with same email/password!");

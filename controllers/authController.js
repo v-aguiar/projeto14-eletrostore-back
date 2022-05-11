@@ -1,7 +1,9 @@
 import { stripHtml } from "string-strip-html";
+import { v4 as uuidv4 } from "uuid";
 import bcrypt from "bcrypt";
 
 import registry_user_schema from "../schemas/registry_user_schema.js";
+import sign_in_schema from "../schemas/sign_in_schema.js";
 import db from "../db/db.js";
 
 export async function registerUser(req, res) {
@@ -39,5 +41,45 @@ export async function registerUser(req, res) {
       return res.status(422).send(error.message);
     }
     res.sendStatus(500);
+  }
+}
+
+export async function signIn(req, res) {
+  const { email, password } = req.body;
+
+  const validateInputs = sign_in_schema.validate({ email, password });
+  if (validateInputs.error) {
+    console.error(
+      "Invalid input data at Joi validation: ",
+      validateInputs.error.message
+    );
+    res.status(401).send("⚠ Invalid input data!");
+    return;
+  }
+
+  try {
+    const registeredUser = await db.collection("users").findOne({ email });
+    if (
+      registeredUser &&
+      bcrypt.compareSync(password, registeredUser.password)
+    ) {
+      const token = uuidv4();
+
+      await db.collection("sessions").insertOne({
+        token,
+        userId: registeredUser._id,
+        timestamp: Date.now(),
+      });
+
+      res.status(200).send({ token, userName: registeredUser.name });
+      return;
+    } else {
+      console.error("⚠ No user registered with same email/password!");
+      res.sendStatus(403);
+      return;
+    }
+  } catch (e) {
+    console.error(e);
+    res.sendStatus(422);
   }
 }

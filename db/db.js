@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const URL = process.env.MONGO_URL || "mongodb://27017";
+const URL = process.env.MONGO_URL || "mongodb://localhost:27017";
 const mongoClient = new MongoClient(URL);
 
 let db = null;

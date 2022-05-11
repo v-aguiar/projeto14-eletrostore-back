@@ -23,6 +23,7 @@
     "string-strip-html": "^9.1.12"
   },
   "devDependencies": {
+    "axios": "^0.27.2",
     "nodemon": "^2.0.16"
   }
 }

@@ -31,3 +31,22 @@ export async function addProducts(req, res) {
     res.status(422).send("⚠ Couldn't add products on database...");
   }
 }
+
+export async function getProducts(req, res) {
+  try {
+    const { category } = req.query;
+    console.log(category);
+    let products = [];
+    if (!category) {
+      products = await db.collection("products").find().toArray();
+    } else {
+      products = await db
+        .collection("products")
+        .find({ categories: category })
+        .toArray();
+    }
+    res.status(200).send(products);
+  } catch (error) {
+    res.sendStatus(500);
+  }
+}

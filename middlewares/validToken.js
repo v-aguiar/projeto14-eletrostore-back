@@ -1,7 +1,6 @@
-import db from "./../db/db/js";
+import db from "./../db/db.js";
 
-import token_schema from "../schemas/token_schema";
-import { response } from "express";
+import token_schema from "../schemas/token_schema.js";
 
 export default async function validToken(req, res, next) {
   const { authorization } = req.headers;
@@ -31,4 +30,6 @@ export default async function validToken(req, res, next) {
   } catch (error) {
     return res.sendStatus(500);
   }
+
+  next();
 }

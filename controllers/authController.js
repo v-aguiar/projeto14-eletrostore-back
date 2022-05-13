@@ -67,7 +67,7 @@ export async function signIn(req, res) {
         .collection("sessions")
         .findOne({ userId: registeredUser._id });
 
-      const token = existingSession.error ? uuidv4() : existingSession.token;
+      const token = !existingSession ? uuidv4() : existingSession.token;
 
       await db.collection("sessions").insertOne({
         token,
@@ -84,6 +84,6 @@ export async function signIn(req, res) {
     }
   } catch (e) {
     console.error(e);
-    res.sendStatus(422);
+    res.sendStatus(500);
   }
 }

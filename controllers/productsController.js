@@ -1,4 +1,5 @@
-﻿import chalk from "chalk";
+﻿import { ObjectId } from "mongodb";
+import chalk from "chalk";
 
 import db from "../db/db.js";
 import products_schema from "../schemas/products_schema.js";
@@ -48,5 +49,22 @@ export async function getProducts(req, res) {
     res.status(200).send(products);
   } catch (error) {
     res.sendStatus(500);
+  }
+}
+
+export async function getProduct(req, res) {
+  const { productId } = req.params;
+
+  try {
+    const product = await db
+      .collection("products")
+      .findOne({ _id: ObjectId(productId) });
+
+    delete product._id;
+
+    res.send(product);
+  } catch (e) {
+    console.error("⚠ Couldn`t fetch product!");
+    res.sendStatus(422);
   }
 }

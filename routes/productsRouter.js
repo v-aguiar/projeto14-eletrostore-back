@@ -1,7 +1,10 @@
 ﻿import { Router } from "express";
 
-import { addProducts, getProduct } from "../controllers/productsController.js";
-import { getProducts } from "../controllers/productsController.js";
+import {
+  addProducts,
+  getProduct,
+  getProducts,
+} from "../controllers/productsController.js";
 import validToken from "../middlewares/validToken.js";
 
 const productsRouter = Router();

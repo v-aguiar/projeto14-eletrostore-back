@@ -12,6 +12,7 @@
   "author": "Victor Aguiar & Icaro Pavani",
   "license": "ISC",
   "dependencies": {
+    "@sendgrid/mail": "^7.6.2",
     "bcrypt": "^5.0.1",
     "chalk": "^5.0.1",
     "cors": "^2.8.5",

@@ -36,8 +36,6 @@ export async function postOrder(req, res) {
       date: dayjs().format("DD/MM - HH:mm"),
     });
 
-    console.log(insertedId);
-
     sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
     const msg = {
@@ -60,7 +58,6 @@ export async function postOrder(req, res) {
       })
       .catch((error) => {
         console.error(error);
-        return res.status(500).send("Cannot send e-mail!");
       });
 
     res.sendStatus(201);

@@ -4,7 +4,7 @@ const order_schema = Joi.object({
   address: Joi.object({
     bairro: Joi.string().required(),
     cep: Joi.string().required(),
-    complemento: Joi.string(),
+    complemento: Joi.string().allow(null, ""),
     localidade: Joi.string().required(),
     logradouro: Joi.string().required(),
     numero: Joi.string().required(),

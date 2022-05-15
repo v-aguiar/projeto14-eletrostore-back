@@ -1,7 +1,11 @@
 import { ObjectId } from "mongodb";
 import dayjs from "dayjs";
+import sgMail from "@sendgrid/mail";
+import dotenv from "dotenv";
 
 import db from "../db/db.js";
+
+dotenv.config();
 
 export async function postOrder(req, res) {
   try {
@@ -23,7 +27,7 @@ export async function postOrder(req, res) {
         );
     }
 
-    await db.collection("orders").insertOne({
+    const { insertedId } = await db.collection("orders").insertOne({
       address,
       products,
       payment,
@@ -31,6 +35,34 @@ export async function postOrder(req, res) {
       email: user.email,
       date: dayjs().format("DD/MM - HH:mm"),
     });
+
+    console.log(insertedId);
+
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+    const msg = {
+      to: user.email, // Change to your recipient
+      from: "icaro.pavani@hotmail.com", // Change to your verified sender
+      subject: `Pedido Realizado na EltroStore`,
+      text: `
+      Seu pedido de tag nr ${insertedId.toString()} foi confirmado na Eletro Store.
+      
+
+
+      Agradecemos pela escolha. Atenciosamente,
+      
+      Eletro Store`,
+    };
+    sgMail
+      .send(msg)
+      .then(() => {
+        console.log("Email sent");
+      })
+      .catch((error) => {
+        console.error(error);
+        return res.status(500).send("Cannot send e-mail!");
+      });
+
     res.sendStatus(201);
   } catch (error) {
     console.log(error);

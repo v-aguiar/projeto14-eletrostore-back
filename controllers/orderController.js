@@ -66,3 +66,17 @@ export async function postOrder(req, res) {
     res.sendStatus(500);
   }
 }
+
+export async function getOrders(req, res) {
+  try {
+    const { user } = res.locals;
+    const orders = await db
+      .collection("orders")
+      .find({ userId: user._id })
+      .toArray();
+    res.status(200).send(orders);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}

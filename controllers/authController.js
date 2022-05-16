@@ -71,18 +71,17 @@ export async function signIn(req, res) {
         .collection("sessions")
         .findOne({ userId });
 
-      const data = userId.toString();
+      const createdSession = await db.collection("sessions").insertOne({
+        userId: registeredUser._id,
+        timestamp: Date.now(),
+      });
+
       const secret_key = process.env.JWT_KEY;
+      const data = createdSession.insertedId.toString();
 
       const token = !existingSession
         ? jwt.sign(data, secret_key)
         : existingSession.token;
-
-      await db.collection("sessions").insertOne({
-        token,
-        userId: registeredUser._id,
-        timestamp: Date.now(),
-      });
 
       res.status(200).send({ token, username: registeredUser.name });
       return;

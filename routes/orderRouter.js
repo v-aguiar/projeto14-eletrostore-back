@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import validToken from "./../middlewares/validToken.js";
 import validOrderBody from "../middlewares/validOrdersBody.js";
-import { postOrder } from "../controllers/orderController.js";
+import { postOrder, getOrders } from "../controllers/orderController.js";
 import checkProductAmount from "../middlewares/checkProductAmount.js";
 
 const orderRouter = Router();
@@ -14,5 +14,7 @@ orderRouter.post(
   checkProductAmount,
   postOrder
 );
+
+orderRouter.get("/orders", validToken, getOrders);
 
 export default orderRouter;

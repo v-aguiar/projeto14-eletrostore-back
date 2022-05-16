@@ -1,10 +1,13 @@
 import { stripHtml } from "string-strip-html";
-import { v4 as uuidv4 } from "uuid";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import dotenv from "dotenv";
 
 import registry_user_schema from "../schemas/registry_user_schema.js";
 import sign_in_schema from "../schemas/sign_in_schema.js";
 import db from "../db/db.js";
+
+dotenv.config();
 
 export async function registerUser(req, res) {
   const { name, email, password, repeat_password } = req.body;
@@ -63,11 +66,17 @@ export async function signIn(req, res) {
       registeredUser &&
       bcrypt.compareSync(password, registeredUser.password)
     ) {
+      const userId = registeredUser._id;
       const existingSession = await db
         .collection("sessions")
-        .findOne({ userId: registeredUser._id });
+        .findOne({ userId });
 
-      const token = !existingSession ? uuidv4() : existingSession.token;
+      const data = userId.toString();
+      const secret_key = process.env.JWT_KEY;
+
+      const token = !existingSession
+        ? jwt.sign(data, secret_key)
+        : existingSession.token;
 
       await db.collection("sessions").insertOne({
         token,

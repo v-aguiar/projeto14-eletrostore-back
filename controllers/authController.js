@@ -66,11 +66,6 @@ export async function signIn(req, res) {
       registeredUser &&
       bcrypt.compareSync(password, registeredUser.password)
     ) {
-      const userId = registeredUser._id;
-      const existingSession = await db
-        .collection("sessions")
-        .findOne({ userId });
-
       const createdSession = await db.collection("sessions").insertOne({
         userId: registeredUser._id,
         timestamp: Date.now(),
@@ -79,9 +74,7 @@ export async function signIn(req, res) {
       const secret_key = process.env.JWT_KEY;
       const data = createdSession.insertedId.toString();
 
-      const token = !existingSession
-        ? jwt.sign(data, secret_key)
-        : existingSession.token;
+      const token = jwt.sign(data, secret_key);
 
       res.status(200).send({ token, username: registeredUser.name });
       return;

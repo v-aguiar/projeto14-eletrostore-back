@@ -1,6 +1,11 @@
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
+
 import db from "./../db/db.js";
 
 import token_schema from "../schemas/token_schema.js";
+
+dotenv.config();
 
 export default async function validToken(req, res, next) {
   const { authorization } = req.headers;
@@ -11,10 +16,12 @@ export default async function validToken(req, res, next) {
     return response.status(422).send("⚠ Invalid Token");
   }
 
+  const secret_key = process.env.JWT_KEY;
+
   try {
-    const session = await db
-      .collection("sessions")
-      .findOne({ token: tokenValidation.value });
+    const sessionId = jwt.verify(tokenValidation.value, secret_key);
+
+    const session = await db.collection("sessions").findOne({ _id: sessionId });
 
     if (!session) {
       return res.sendStatus(401);

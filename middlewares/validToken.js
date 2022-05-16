@@ -1,5 +1,6 @@
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
+import { ObjectId } from "mongodb";
 
 import db from "./../db/db.js";
 
@@ -21,7 +22,9 @@ export default async function validToken(req, res, next) {
   try {
     const sessionId = jwt.verify(tokenValidation.value, secret_key);
 
-    const session = await db.collection("sessions").findOne({ _id: sessionId });
+    const session = await db
+      .collection("sessions")
+      .findOne({ _id: new ObjectId(sessionId) });
 
     if (!session) {
       return res.sendStatus(401);
